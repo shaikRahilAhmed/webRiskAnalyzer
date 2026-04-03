@@ -1,0 +1,11 @@
+{
+  "name": "web-risk-analyzer-root",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm install --prefix web-risk-analyzer/backend --legacy-peer-deps && npm install --prefix web-risk-analyzer/frontend --legacy-peer-deps && npm run build --prefix web-risk-analyzer/frontend",
+    "start": "node web-risk-analyzer/backend/server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

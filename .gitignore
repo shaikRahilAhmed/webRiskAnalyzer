@@ -1,0 +1,8 @@
+node_modules/
+web-risk-analyzer/frontend/node_modules/
+web-risk-analyzer/backend/node_modules/
+web-risk-analyzer/frontend/dist/
+web-risk-analyzer/backend/db/wra_data.json
+web-risk-analyzer/backend/.env
+.DS_Store
+*.log
