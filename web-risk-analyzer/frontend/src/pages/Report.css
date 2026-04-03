@@ -1,0 +1,196 @@
+.report-page { display: flex; flex-direction: column; gap: 20px; }
+@media (min-width: 640px) { .report-page { gap: 24px; } }
+
+.report-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.back-btn { display: flex; align-items: center; gap: 6px; }
+
+/* Report header: stacked on mobile, side-by-side on tablet+ */
+.report-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .report-header {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 28px;
+    text-align: left;
+  }
+}
+
+.score-circle {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 5px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .score-circle { width: 130px; height: 130px; }
+}
+
+.score-number { font-size: 30px; font-weight: 800; line-height: 1; }
+.score-label  { font-size: 12px; color: #64748b; }
+.score-tag    { font-size: 10px; font-weight: 700; margin-top: 4px; }
+
+@media (min-width: 640px) {
+  .score-number { font-size: 36px; }
+  .score-label  { font-size: 13px; }
+  .score-tag    { font-size: 11px; }
+}
+
+.report-meta { flex: 1; width: 100%; }
+.report-meta h2 { font-size: 17px; font-weight: 700; color: #e2e8f0; margin-bottom: 10px; }
+
+@media (min-width: 640px) { .report-meta h2 { font-size: 20px; } }
+
+.report-url, .report-time {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+@media (min-width: 640px) {
+  .report-url, .report-time { font-size: 13px; align-items: center; }
+}
+
+.report-url span { word-break: break-all; }
+
+.report-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+@media (min-width: 640px) { .summary-item { font-size: 13px; } }
+
+.summary-item strong { color: #e2e8f0; }
+
+.checks-section h3 { font-size: 16px; font-weight: 600; color: #e2e8f0; margin-bottom: 14px; }
+@media (min-width: 640px) { .checks-section h3 { font-size: 18px; margin-bottom: 16px; } }
+
+.checks-list { display: flex; flex-direction: column; gap: 10px; }
+
+.check-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 14px;
+  border-left: 4px solid #334155;
+}
+
+@media (min-width: 640px) { .check-card { padding: 16px; } }
+
+.check-card.check-safe    { border-left-color: #22c55e; }
+.check-card.check-danger  { border-left-color: #ef4444; }
+.check-card.check-warning { border-left-color: #f59e0b; }
+.check-card.check-unknown { border-left-color: #6366f1; }
+
+.check-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.check-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+  flex: 1;
+  min-width: 0;
+}
+
+@media (min-width: 640px) { .check-name { font-size: 14px; } }
+
+.check-points { font-size: 12px; color: #ef4444; font-weight: 600; white-space: nowrap; }
+
+.check-message {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-left: 24px;
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) {
+  .check-message { font-size: 13px; margin-left: 26px; }
+}
+
+.check-fix {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  margin-left: 24px;
+  font-size: 12px;
+  color: #6366f1;
+  background: #0f172a;
+  padding: 8px 10px;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) { .check-fix { margin-left: 26px; } }
+
+.recommendations h3 { font-size: 15px; font-weight: 600; color: #e2e8f0; margin-bottom: 14px; }
+
+.recommendations ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recommendations li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  gap: 16px;
+  color: #64748b;
+}
+
+.spin-slow { animation: spin 2s linear infinite; }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
