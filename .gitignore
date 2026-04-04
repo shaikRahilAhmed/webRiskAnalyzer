@@ -4,5 +4,7 @@ web-risk-analyzer/backend/node_modules/
 web-risk-analyzer/frontend/dist/
 web-risk-analyzer/backend/db/wra_data.json
 web-risk-analyzer/backend/.env
+web-risk-analyzer/backend/package-lock.json
+web-risk-analyzer/frontend/package-lock.json
 .DS_Store
 *.log
