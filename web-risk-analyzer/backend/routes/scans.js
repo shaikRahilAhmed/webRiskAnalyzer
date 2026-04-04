@@ -7,7 +7,7 @@ const router = express.Router()
 router.use(authMiddleware)
 
 // POST /api/scans/analyze
-router.post('/analyze', (req, res) => {
+router.post('/analyze', async (req, res) => {
   const { url } = req.body
   if (!url) return res.status(400).json({ error: 'URL is required' })
 
@@ -17,7 +17,7 @@ router.post('/analyze', (req, res) => {
   }
 
   try {
-    const analysis = performAnalysis(normalized)
+    const analysis = await performAnalysis(normalized)
     const scan = db.createScan(
       req.user.id,
       normalized,
@@ -42,8 +42,7 @@ router.get('/history', (req, res) => {
   const limit = parseInt(req.query.limit) || 100
   const scans = db.getScansByUser(req.user.id, limit)
   res.json(scans.map(s => ({
-    id: s.id,
-    url: s.url,
+    id: s.id, url: s.url,
     risk_score: s.risk_score,
     risk_level: s.risk_level,
     created_at: s.created_at
@@ -54,7 +53,6 @@ router.get('/history', (req, res) => {
 router.get('/:id', (req, res) => {
   const scan = db.getScanById(req.params.id, req.user.id)
   if (!scan) return res.status(404).json({ error: 'Scan not found' })
-
   res.json({
     ...scan,
     checks: JSON.parse(scan.checks || '{}'),

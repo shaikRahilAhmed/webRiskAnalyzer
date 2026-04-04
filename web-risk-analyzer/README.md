@@ -1,32 +1,66 @@
 # Web Risk Analyzer
 
-A website security assessment tool that scans for malicious URLs, SSL issues,
-exposed ports, security headers, and common vulnerabilities.
+A website security assessment tool with a dual-backend architecture:
+- **Node.js (Express)** — auth, users, scan history, admin
+- **Python (Flask)** — security scanning engine, risk analysis
+
+---
+
+## Architecture
+
+```
+React Frontend (port 3000)
+        ↓
+Node.js Express API (port 5000)  ←→  Python Flask Scanner (port 5001)
+        ↓
+  JSON File Database
+```
+
+Node.js calls Flask for scan analysis. If Flask is unavailable, Node falls back to its own built-in scanner automatically.
 
 ---
 
 ## Local Development
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) v18 or higher
-- npm (comes with Node.js)
+- Node.js v18+
+- Python 3.9+
+- pip
 
-### Step 1 — Backend
+---
+
+### Step 1 — Python Flask Scanner
+
+```bash
+cd web-risk-analyzer/python-scanner
+pip install -r requirements.txt
+python app.py
+```
+Flask scanner runs at: **http://localhost:5001**
+
+---
+
+### Step 2 — Node.js Backend
+
 ```bash
 cd web-risk-analyzer/backend
-npm install --legacy-peer-deps --no-audit --no-fund
+npm install --legacy-peer-deps
 node server.js
 ```
-Backend runs at: **http://localhost:5000**
+Node backend runs at: **http://localhost:5000**
 
-### Step 2 — Frontend
-Open a second terminal:
+---
+
+### Step 3 — React Frontend
+
 ```bash
 cd web-risk-analyzer/frontend
-npm install --legacy-peer-deps --no-audit --no-fund
+npm install --legacy-peer-deps
 npm run dev
 ```
 Frontend runs at: **http://localhost:3000**
+
+---
 
 ### Default Login
 | Role  | Email         | Password |
@@ -35,105 +69,86 @@ Frontend runs at: **http://localhost:3000**
 
 ---
 
-## Deploy to Render (Free Hosting)
+## Deploy to Render
 
-### Step 1 — Push to GitHub
+### Service 1 — Python Flask Scanner
 
-1. Create a new repo on [github.com](https://github.com/new)
-2. Open a terminal in the `web-risk-analyzer` folder and run:
-
-```bash
-git init
-git add .
-git commit -m "Initial commit - Web Risk Analyzer"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-git push -u origin main
-```
-
----
-
-### Step 2 — Create a Web Service on Render
-
-1. Go to [render.com](https://render.com) and sign up / log in
-2. Click **"New +"** → **"Web Service"**
-3. Connect your GitHub account and select your repository
-4. Fill in the settings:
+1. Render → New+ → **Web Service**
+2. Connect your GitHub repo
+3. Settings:
 
 | Field | Value |
 |-------|-------|
-| **Name** | web-risk-analyzer |
-| **Region** | Choose closest to you |
-| **Branch** | main |
-| **Root Directory** | *(leave blank)* |
-| **Runtime** | Node |
-| **Build Command** | `npm run build` |
-| **Start Command** | `npm start` |
-| **Instance Type** | Free |
+| Name | wra-scanner |
+| Root Directory | `web-risk-analyzer/python-scanner` |
+| Runtime | Python 3 |
+| Build Command | `pip install -r requirements.txt` |
+| Start Command | `gunicorn app:app --bind 0.0.0.0:$PORT` |
+| Instance Type | Free |
+
+4. Environment Variables:
+   - `FLASK_DEBUG` = `false`
+
+5. Copy the service URL (e.g. `https://wra-scanner.onrender.com`)
 
 ---
 
-### Step 3 — Add Environment Variables
+### Service 2 — Node.js Backend + React Frontend
 
-In the Render dashboard, go to your service → **Environment** tab → Add these:
+1. Render → New+ → **Web Service**
+2. Connect same repo
+3. Settings:
 
-| Key | Value |
-|-----|-------|
-| `NODE_ENV` | `production` |
-| `JWT_SECRET` | `any_long_random_string_here` |
-| `PORT` | `10000` |
+| Field | Value |
+|-------|-------|
+| Name | wra-app |
+| Root Directory | *(leave blank)* |
+| Runtime | Node |
+| Build Command | `npm run build` |
+| Start Command | `npm start` |
+| Instance Type | Free |
 
-> **Important:** Change `JWT_SECRET` to something long and random like:
-> `x7k2mP9qR4nL8vW3jY6hT1cA5bE0dF`
+4. Environment Variables:
+   - `NODE_ENV` = `production`
+   - `JWT_SECRET` = `your_long_random_secret`
+   - `PORT` = `10000`
+   - `SCANNER_URL` = `https://wra-scanner.onrender.com` ← URL from Service 1
 
----
-
-### Step 4 — Deploy
-
-1. Click **"Create Web Service"**
-2. Render will automatically:
-   - Install frontend dependencies
-   - Build the React app (`npm run build`)
-   - Install backend dependencies
-   - Start the Express server
-3. Wait 3–5 minutes for the first deploy to finish
-4. Your app will be live at: `https://your-app-name.onrender.com`
+5. Deploy → your app is live at `https://wra-app.onrender.com`
 
 ---
 
-### Step 5 — Open Your App
+## API Reference
 
-Visit the URL Render gives you (e.g. `https://web-risk-analyzer.onrender.com`)
+### Flask Scanner (port 5001)
 
-Login with:
-- Email: `admin@wra.com`
-- Password: `admin123`
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+| POST | `/analyze` | Analyze a URL |
+| POST | `/lists/sync` | Sync blacklist/whitelist from Node |
 
-> **Note:** On Render's free tier, the service sleeps after 15 minutes of inactivity.
-> First load after sleep takes ~30 seconds to wake up. This is normal.
+### Node.js API (port 5000)
 
----
-
-## How It Works on Render
-
-```
-Render Server
-├── npm run build  →  builds React into frontend/dist/
-└── npm start      →  starts Express which:
-                       ├── serves /api/* routes (backend)
-                       └── serves frontend/dist/ (React app)
-```
-
-Everything runs as a **single service** — no separate frontend hosting needed.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register user |
+| POST | `/api/auth/login` | Login |
+| POST | `/api/scans/analyze` | Scan a URL |
+| GET | `/api/scans/history` | Scan history |
+| GET | `/api/scans/:id` | Get scan report |
+| DELETE | `/api/scans/:id` | Delete scan |
+| GET | `/api/admin/users` | List users (admin) |
+| GET/POST/DELETE | `/api/admin/blacklist` | Manage blacklist |
+| GET/POST/DELETE | `/api/admin/whitelist` | Manage whitelist |
 
 ---
 
 ## Tech Stack
 
-| Layer    | Technology |
-|----------|------------|
+| Layer | Technology |
+|-------|------------|
 | Frontend | React 18, Vite, React Router, Recharts, Lucide |
-| Backend  | Node.js, Express.js |
+| Node Backend | Node.js, Express.js, JWT, bcryptjs |
+| Python Backend | Python 3, Flask, Flask-CORS, Gunicorn |
 | Database | JSON file store (zero setup) |
-| Auth     | JWT + bcryptjs |
-| Hosting  | Render.com |
